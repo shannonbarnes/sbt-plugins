@@ -1,6 +1,6 @@
 # Whil SBT Plugins
 
-A responsitory for various SBT plugins
+A repository for various SBT plugins
 
 ## sbt-whil-cassandra
 
