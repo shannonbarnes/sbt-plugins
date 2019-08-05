@@ -1,0 +1,17 @@
+*.class
+*.log
+*.sc
+
+# IntelliJ
+*.iml
+*.ipr
+*.iws
+.idea
+
+# building
+target
+build
+null
+tmp*
+dist
+test-output
