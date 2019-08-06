@@ -19,5 +19,5 @@
       },
       libraryDependencies ++= Seq(
        "com.datastax.cassandra" % "cassandra-driver-core" % "3.5.0",
-       "org.cassandraunit" % "cassandra-unit" % "3.1.3.2"))
+       "org.cassandraunit" % "cassandra-unit" % "3.11.2.0"))
 
