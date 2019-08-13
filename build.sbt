@@ -1,7 +1,7 @@
 
 
   ThisBuild / organization := "com.whil"
-  ThisBuild / version      := "1.0.0-SNAPSHOT"
+  ThisBuild / version      := "1.0.1-SNAPSHOT"
 
   lazy val `sbt-plugins` = (project in file("."))
     .settings(

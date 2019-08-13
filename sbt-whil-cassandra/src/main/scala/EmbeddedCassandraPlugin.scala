@@ -8,60 +8,73 @@ import sbt._
 import sbt.Keys._
 
 object EmbeddedCassandraPlugin extends AutoPlugin {
-  //Name of the file containing preload script
-  val scriptName = SettingKey[Option[String]]("setup-script-name")
-  val scriptBase = SettingKey[File]("setup-script-base")
-  val setupScript = SettingKey[Option[File]]("embedded-db-setup-script")
 
-  private def checkFile(f: File, s: Keys.TaskStreams) =
-    if (f.exists())
-      Some(f)
-    else {
-      s.log.info("Embedded Cassandra: setup script is not found at " + f.getAbsolutePath)
-      None
-    }
+  object autoImport {
 
-  private def setupStep(s: Keys.TaskStreams, fileOpt: Option[File]) = Tests.Setup( () => {
-    s.log.info("Embedded Cassandra: starting")
+    val scriptName = SettingKey[Option[String]]("setup-script-name")
+    val scriptBase = SettingKey[File]("setup-script-base")
+    val setupScript = SettingKey[Option[File]]("embedded-db-setup-script")
+
+    val startCassandra = taskKey[Unit]("starts embedded cassandra")
+    val loadCassandra = taskKey[Unit]("loads embedded-db-setup-script")
+    val stopCassandra = taskKey[Unit]("stops embedded cassandra")
+
+  }
+
+  import autoImport._
+
+  val defaultScriptName = "test-schema.cql"
+
+  private def startCassandraTask(log: Logger) =  {
+    log.info("Embedded Cassandra: starting")
     EmbeddedCassandraServerHelper.startEmbeddedCassandra()
+  }
 
-    fileOpt match {
-      case None =>
-        s.log.debug("Embedded Cassandra: skip setup step as setup script is not provided")
-      case Some(someFile) =>
-        s.log.info("Embedded Cassandra: loading test data " + someFile.getAbsolutePath)
-
-        checkFile(someFile, s) match {
-          case None =>
-            s.log.error("Embedded Cassandra: failed to locate setup CQL. Defined as " + someFile.getAbsolutePath)
-          case Some(f) =>
-            val cluster = new Cluster.Builder().addContactPoints("localhost").withPort(9142).build().connect
-            val dataLoader = new CQLDataLoader(cluster)
-            dataLoader.load(new FileCQLDataSet(f.getAbsolutePath))
-            s.log.debug("Embedded Cassandra: ready")
-        }
-      }
-    }
-  )
-
-  private def cleanupStep(s: Keys.TaskStreams) = Tests.Cleanup(() => {
-    s.log.debug("Embedded Cassandra: stopping")
+  private def stopCassandraTask(log: Logger) =  {
+    log.info("Embedded Cassandra: stopping")
     try {
       EmbeddedCassandraServerHelper.cleanEmbeddedCassandra()
-      s.log.debug("Embedded Cassandra stopped")
+      log.info("Embedded Cassandra stopped")
     } catch {
-      case t:Exception => s.log.warn("Failed to stop Embedded Cassandra due to: " + t)
+      case t: Exception => log.warn(s"Failed to stop Embedded Cassandra due to: $t")
     }
-  })
+  }
+
+  private def loadCassandraTask(log: Logger, fileOpt: Option[File]) =
+    fileOpt match {
+      case None =>
+        log.debug("Embedded Cassandra: skip setup step as setup script is not provided")
+      case Some(file) if file.exists =>
+        log.info("Embedded Cassandra: loading test data " + file.getAbsolutePath)
+        val cluster = new Cluster.Builder().addContactPoints("localhost").withPort(9142).build().connect
+        val dataLoader = new CQLDataLoader(cluster)
+        dataLoader.load(new FileCQLDataSet(file.getAbsolutePath))
+        log.debug("Embedded Cassandra: ready")
+      case Some(file) =>
+        log.error("Embedded Cassandra: failed to locate setup CQL. Defined as " + file.getAbsolutePath)
+    }
+
+  private def setupStep(log: Logger, fileOpt: Option[File]) = Tests.Setup { () =>
+    startCassandraTask(log)
+    loadCassandraTask(log, fileOpt)
+  }
+
+  private def cleanupStep(log: Logger) = Tests.Cleanup { () =>
+    stopCassandraTask(log)
+  }
 
   override lazy val projectSettings: Seq[Setting[_]] = Seq(
     scriptBase := (Test / resourceDirectory).value,
-    scriptName := Some("test-schema.cql"),
+    scriptName := Some(defaultScriptName),
     setupScript := scriptName.value map (n => scriptBase.value / n),
 
+    startCassandra := startCassandraTask(sLog.value),
+    loadCassandra := loadCassandraTask(sLog.value, setupScript.value),
+    stopCassandra := stopCassandraTask(sLog.value),
+
     Test / testOptions ++= Seq(
-      setupStep(streams.value, setupScript.value),
-      cleanupStep(streams.value)
+      setupStep(sLog.value, setupScript.value),
+      cleanupStep(sLog.value)
     )
   )
 }
