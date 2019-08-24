@@ -1,0 +1,2 @@
+# check that test can connect to embedded Cassandra. If it does not then test command will fail and it will fail the test
+> test
