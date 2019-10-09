@@ -10,7 +10,7 @@ env:
 
 script:
   - sbt test
-  - if [ $TRAVIS_BRANCH = $DIST_BRANCH ]; sbt publish; fi
+  - if [ "$TRAVIS_BRANCH" = "$DIST_BRANCH" ]; then sbt publish; fi
 
 before_cache:
   - find $HOME/.sbt -name "*.lock" | xargs rm
