@@ -5,7 +5,9 @@
 
   lazy val `sbt-plugins` = (project in file("."))
     .settings(
-      publish / skip := true)
+      publishMavenStyle := false,
+      publishTo := Some(Resolver.url("whil-ivy", url("s3://whil-ivy"))(Resolver.ivyStylePatterns))
+    )
     .aggregate(
       `sbt-whil`, `sbt-whil-test-databases`
     )
