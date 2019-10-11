@@ -1,7 +1,7 @@
 
 
   ThisBuild / organization := "com.whil"
-  ThisBuild / version      := "1.1.0-SNAPSHOT"
+  ThisBuild / version      := "1.1.1-SNAPSHOT"
 
   lazy val `sbt-plugins` = (project in file("."))
     .settings(
@@ -24,7 +24,9 @@
   lazy val `sbt-whil` = project
     .enablePlugins(SbtPlugin)
     .settings(
+      resolvers += Resolver.jcenterRepo,
       addSbtPlugin("com.typesafe.sbt"  % "sbt-native-packager"   % "1.3.25"),
+      addSbtPlugin("ohnosequences"  % "sbt-s3-resolver"   % "0.19.0"),
       scriptedLaunchOpts := { scriptedLaunchOpts.value ++
         Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
       }

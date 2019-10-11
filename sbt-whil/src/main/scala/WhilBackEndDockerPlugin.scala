@@ -1,7 +1,7 @@
 package com.whil.sbt
 
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport._
-import sbt.Keys.{version, _}
+import sbt.Keys._
 import sbt._
 
 import scala.sys.process._
