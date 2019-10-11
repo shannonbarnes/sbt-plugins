@@ -5,7 +5,9 @@
 
   lazy val `sbt-plugins` = (project in file("."))
     .settings(
-      publish / skip := true)
+      publishMavenStyle := true,
+      publishTo := Some("whil-ivy" at "s3://whil-ivy"),
+    )
     .aggregate(
       `sbt-whil`, `sbt-whil-test-databases`
     )
@@ -14,6 +16,8 @@
   lazy val `sbt-whil-test-databases` = project
     .enablePlugins(SbtPlugin)
     .settings(
+      publishMavenStyle := true,
+      publishTo := Some("whil-ivy" at "s3://whil-ivy"),
       scriptedLaunchOpts := { scriptedLaunchOpts.value ++
         Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
       },
@@ -24,6 +28,8 @@
   lazy val `sbt-whil` = project
     .enablePlugins(SbtPlugin)
     .settings(
+      publishMavenStyle := true,
+      publishTo := Some("whil-ivy" at "s3://whil-ivy"),
       addSbtPlugin("com.typesafe.sbt"  % "sbt-native-packager"   % "1.3.25"),
       scriptedLaunchOpts := { scriptedLaunchOpts.value ++
         Seq("-Xmx1024M", "-Dplugin.version=" + version.value)

@@ -1,0 +1,24 @@
+language: scala
+jdk: openjdk8
+env:
+  global:
+    # AWS_ACCESS_KEY_ID
+    - secure: "bw9w4vg0MyNiBYOfPJNGqxLeDuOyp34m2GllpsLk+qFczzF7P0CNDHmnX5uNYv6oxMPfs5AIWSyEl8OuOvoOX/SZ6mtIK+YEiIQFvMLZQtuSyQ4vkDP9YGR/pR4dJna/8QK1fl1yndLD7JbWduTDGKB028VYCIPzszcoDV4ZIX4b8BLIwV683EXEDv+ZHBE8Gi5uousFM6Se05rVusbR4ueyItHujXaQ/tvoaY87Gn9NlPpDeKTQSN8r5Q+7DMWPKdrwCoo5ZUq+MNAXjd3D+uNdJY2q5KcVTh4UhS/6Xum8c15lO/kiXB6yXtFN5NssSZ/asSlMm4/f3/Sr+XkolpL7sRVk1+tKQLfy0JhSwaRun367lT1RXZ2z4wSKQrXFoj59B5bbd2MK06TOCFjh8Yp2asu4DSF/vT4nUct30uYBt7QvUgsY3Vmi8WBIrRFH79DoCtIqTKinr3a65+EbKWFHShW8DClOH1Vyh+f1XL08J120PqZkvN5png5y7wYE3kmq2HQKYojWkpAiEgXq3DKzOT+wx21/7Yl42kVp9TK+57Ijd7fOlR/C8KEU08ECUIA9iqmf5xkIg1x+kwxCv82VYDDswnTXqpff7CbRnBmMOIohSf7CqoHsBLen6iq90tSIK5zsQX2/iY0quJ2q7ZbOB2SYpiaMlAU9VlhGJMs="
+    # AWS_SECRET_ACCESS_KEY
+    - secure: "PuH93XGmha71zr6agI6iKi/od0utdgNFkH9NjYhIs6MFjM4OPg6oepk5Avw4tjG7upMbs2FAG0GXSP6Lcrn6SV111hacr1WXilDssvFb3nhnlCBuzPMMim60spa7ScARpjbGFSxkmGOuc8vdJJIhWj55n6k/3j+yC2rAZYhW/L7qirFfVayjkDh6z5URxY3GM4QTABLMMgmkW75OlgsbEQhABMdgMK14UQn6M7keiYjQtrXlgtir2LjPS6Qu8GQLwuQjfjQfKfRtRZcjyd9wkGo2+Zoerri0+OExys40EVu2cvnlYQqAf2YK7WHg1i1gc+EWBecWkID6L+Lxlvkws1mVFzsYMWLZwsBdl2Vfpwy0dAGTZAhmC8hV92Pc6YBUXOqGdopAcPl4YzHrJ2nXvyN3X7+2hBpwizN0Zepn1X/nMQ2y/tJPKgblEG99WD5kWCa25C0XQD+nAT7YSYOa8L3PL8ShX/uORhhlB9GpNWQgws7Hp/WdE7+m1InynvLNv2/AYjRMEbRbav5/U5KbKDb0vTettVY/sb3fcOdldS5VZFlQvlgtiLDv5ut6UsZZPF1CIZjIMAxTWheVe2WCdf3OaeZiZ9WUyvOS1gVVQE/S3cQHTNI8p3Vs/+UmsLc8IJrxBm1bfYvCNnVynFn5iF2drJxv1wh4nL6dYOQZlfM="
+    - AWS_REGION=us-east-1
+
+script:
+  - sbt test
+  - if [ "$TRAVIS_BRANCH" = "$DIST_BRANCH" ]; then sbt publish; fi
+
+before_cache:
+  - find $HOME/.sbt -name "*.lock" | xargs rm
+  - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
+  - rm -f $HOME/.ivy2/.sbt.ivy.lock
+
+cache:
+  directories:
+    - "$HOME/.cache/coursier"
+    - "$HOME/.ivy2/cache"
+    - "$HOME/.sbt/boot/"
