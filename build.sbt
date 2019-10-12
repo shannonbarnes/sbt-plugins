@@ -1,11 +1,13 @@
 
 
   ThisBuild / organization := "com.whil"
-  ThisBuild / version      := "1.1.1-SNAPSHOT"
+  ThisBuild / version      := "1.1.12-SNAPSHOT"
+
 
   lazy val `sbt-plugins` = (project in file("."))
     .settings(
-      publish / skip := true)
+      publish / skip := true,
+    )
     .aggregate(
       `sbt-whil`, `sbt-whil-test-databases`
     )
@@ -13,6 +15,7 @@
 
   lazy val `sbt-whil-test-databases` = project
     .enablePlugins(SbtPlugin)
+    .enablePlugins(WhilLibPlugin)
     .settings(
       scriptedLaunchOpts := { scriptedLaunchOpts.value ++
         Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
@@ -23,10 +26,12 @@
 
   lazy val `sbt-whil` = project
     .enablePlugins(SbtPlugin)
+    .enablePlugins(WhilLibPlugin)
     .settings(
-      resolvers += Resolver.jcenterRepo,
+      publishMavenStyle := true,
+      publishTo := Some("whil-ivy" at "s3://whil-ivy"),
       addSbtPlugin("com.typesafe.sbt"  % "sbt-native-packager"   % "1.3.25"),
-      addSbtPlugin("ohnosequences"  % "sbt-s3-resolver"   % "0.19.0"),
+      addSbtPlugin("com.frugalmechanic" % "fm-sbt-s3-resolver" % "0.19.0"),
       scriptedLaunchOpts := { scriptedLaunchOpts.value ++
         Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
       }

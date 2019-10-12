@@ -18,7 +18,8 @@ object WhilBackEndDockerPlugin extends AutoPlugin {
     Docker / version := version.value  +
       Process("git tag").lineStream.reverse.headOption.getOrElse("") +
       "-b" + sys.props.getOrElse("build_number", default = "local-dev"),
-     dockerRepository := Some("whil")
-  )
+     dockerRepository := Some("whil"),
+     ContinuousIntegration.buildType := ContinuousIntegration.DockerImage
+  ) ++ ContinuousIntegration.settings
 
 }
