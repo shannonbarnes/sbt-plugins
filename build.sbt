@@ -28,8 +28,6 @@
     .enablePlugins(SbtPlugin)
     .enablePlugins(WhilLibPlugin)
     .settings(
-      publishMavenStyle := true,
-      publishTo := Some("whil-ivy" at "s3://whil-ivy"),
       addSbtPlugin("com.typesafe.sbt"  % "sbt-native-packager"   % "1.3.25"),
       addSbtPlugin("com.frugalmechanic" % "fm-sbt-s3-resolver" % "0.19.0"),
       scriptedLaunchOpts := { scriptedLaunchOpts.value ++
